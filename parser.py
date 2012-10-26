@@ -67,12 +67,13 @@ class DmozHandler(handler.ContentHandler):
     self._handler.finish()
 
 class DmozParser:
-  def __init__(self):
+  def __init__(self, file_path):
+    self._file_path = file_path
     self._parser = make_parser()
 
   def run(self):
     self._parser.setContentHandler(DmozHandler(self._handler))
-    self._parser.parse(FileWrapper('content.rdf.u8'))
+    self._parser.parse(FileWrapper(self._file_path))
 
   def add_handler(self, handler):
     self._handler = handler

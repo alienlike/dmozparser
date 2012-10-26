@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 
 from parser import DmozParser
-from handlers import JSONWriter
 
-parser = DmozParser()
-parser.add_handler(JSONWriter('output.json'))
+DMOZ_FILE = '../content.rdf.u8'
+
+class TestHandler:
+    def page(self, page, content):
+        print page, content
+    def finish(self): return
+
+parser = DmozParser(DMOZ_FILE)
+parser.add_handler(TestHandler())
 parser.run()
