@@ -1,21 +1,25 @@
 from __future__ import division
 from xml.sax import make_parser, handler
 import os
-import codecs
 
 class FileWrapper(file):
   def __init__(self, name):
     self._name = name
     self._bytes = os.path.getsize(name)
     self._bytes_read = 0
+    self._progress = 0
+    print '0% complete'
 
     file.__init__(self, name)
 
   def read(self, size):
-    print '\x1B[2F'
-    print '\x1B[2K'
-    print 'processed %d%%' % self.progress(),
+
     self._bytes_read += size
+
+    progress = int(self.progress())
+    if self._progress < progress:
+        print '%d%% complete' % progress
+        self._progress = progress
 
     return file.read(self, size)
 
@@ -50,7 +54,6 @@ class DmozHandler(handler.ContentHandler):
     if self._capture_content:
       assert not self._expect_end
       self._current_content[self._capture_content_type] = content
-#      print self._capture_content_type, self._current_content[self._capture_content_type]
       if self._capture_content_type == "topic":
         # This makes the assumption that "topic" is the last entity in each dmoz page:
         #   <ExternalPage about="http://www.awn.com/">
@@ -77,4 +80,3 @@ class DmozParser:
 
   def add_handler(self, handler):
     self._handler = handler
-
