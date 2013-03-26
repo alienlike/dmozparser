@@ -22,6 +22,7 @@ class DmozContentHandler(handler.ContentHandler):
         self._current_page = ''
         self._capture_content = False
         self._current_content = {}
+        self._capture_content_type = None
         self._expect_end = False
 
     def startElement(self, name, attrs):
@@ -38,15 +39,16 @@ class DmozContentHandler(handler.ContentHandler):
             assert name == 'topic' or name == 'ExternalPage'
             if name == 'ExternalPage':
                 self._expect_end = False
+                self._handler.page(self._current_page, self._current_content)
+            self._capture_content_type = None
+        if name == 'topic':
+            self._expect_end = True
+        self._capture_content = False
 
     def characters(self, content):
         if self._capture_content:
-            assert not self._expect_end
-            self._current_content[self._capture_content_type] = content
-            if self._capture_content_type == "topic":
-                self._handler.page(self._current_page, self._current_content)
-                self._expect_end = True
-            self._capture_content = False
+            self._current_content.setdefault(self._capture_content_type, '')
+            self._current_content[self._capture_content_type] += content
 
     def endDocument(self):
         self._handler.finish()
