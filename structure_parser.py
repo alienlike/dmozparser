@@ -65,7 +65,10 @@ class DmozStructureParser:
 
     def run(self):
         self._parser.setContentHandler(DmozStructureHandler(self._handler))
-        self._parser.parse(FileWrapper(self._file_path))
+        if hasattr(self._file_path, 'read'):
+            self._parser.parse(self._file_path)
+        else:
+            self._parser.parse(FileWrapper(self._file_path))
 
     def add_handler(self, handler):
         self._handler = handler
